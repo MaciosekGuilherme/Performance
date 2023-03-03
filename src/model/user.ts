@@ -1,27 +1,39 @@
 export type user = {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-};
-
-export type AuthenticationData = {
-   id: string
+  id: string
+  email: string
+  password: string
+  name: string
+  nickname: string
 }
 
-export type UserInputDTO = {
-  name: string;
-  email: string;
-  password: string;
-};
+export type Email = {
+newemail: string
+}
 
-export type LoginInputDTO = {
-  email: string;
-  password: string;
-};
+export interface UserInputDTO {
+  name: string,
+  nickname: string,
+  email: string,
+  password: string
+}
 
-export type RecipeInputDTO = {
-  title: string;
-  description: string;
-  MethodOfPreparation: string;
-};
+export interface EditUserInputDTO {
+  name: string,
+  nickname: string,
+  token: string
+}
+
+export interface EditUserInput {
+  name: string,
+  nickname: string,
+  id: string
+}
+
+export type AuthenticationData = {
+  id: string
+}
+
+export interface LoginInputDTO {
+  email: string,
+  password: string
+}

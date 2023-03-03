@@ -1,7 +1,7 @@
 import { InvalidEmail } from './../error/customError';
 import { CustomError } from "../error/customError";
-import { BaseDatabase } from "./BaseDatabse";
-import { user } from "../model/user";
+import { BaseDatabase } from "./BaseDatabase";
+import { EditUserInput, user } from "../model/user";
 
 export class UserDatabase extends BaseDatabase {
   public findUser = async (email: string) => {
@@ -16,7 +16,7 @@ export class UserDatabase extends BaseDatabase {
     }
   };
 
-  public createUser = async (user: user) => {
+  public signup = async (user: user) => {
     try {
       await UserDatabase.connection
         .insert({
@@ -26,6 +26,17 @@ export class UserDatabase extends BaseDatabase {
           password: user.password,
         })
         .into("performance_user_panel");
+    } catch (error: any) {
+      throw new CustomError(400, error.message);
+    }
+  };
+
+  public editUser = async (user: EditUserInput) => {
+    try {
+      await UserDatabase.connection
+        .update({ name: user.name, nickname: user.nickname })
+        .where({ id: user.id })
+        .into("Auth_users");
     } catch (error: any) {
       throw new CustomError(400, error.message);
     }

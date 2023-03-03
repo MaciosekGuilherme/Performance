@@ -1,25 +1,26 @@
-import { UserInputDTO, LoginInputDTO, RecipeInputDTO } from "./../model/user";
+import { UserInputDTO, LoginInputDTO, EditUserInputDTO, EditUserInput } from "./../model/user";
 import { IdGenerator } from "./../services/IdGenerator";
 import {
   InvalidPassword,
   InvalidEmail,
   InvalidName,
   UserNotFound,
-  InvalidLenght,
 } from "./../error/customError";
 import { TokenGenerator } from "./../services/TokenGenerator";
 import { HashManager } from "../services/HashManager";
 import { UserDatabase } from "../data/UserDatabase";
 import { CustomError } from "../error/customError";
 import { user } from "../model/user";
+import { Authenticator } from "../services/Authenticator";
 
 const idGenerator = new IdGenerator();
 const tokenGenerator = new TokenGenerator();
 const userDatabase = new UserDatabase();
 const hashManager = new HashManager();
+const authenticator = new Authenticator()
 
 export class UserBusiness {
-  public createUser = async (input: UserInputDTO): Promise<string> => {
+  public signup = async (input: UserInputDTO): Promise<string> => {
     try {
       const { name, email, password } = input;
 
@@ -48,12 +49,13 @@ export class UserBusiness {
 
       const user: user = {
         id,
-        name,
+        name,        
         email,
         password: hashPassword,
+        nickname: name.toLowerCase()
       };
 
-      await userDatabase.createUser(user);
+      await userDatabase.signup(user);
       const token = tokenGenerator.generateToken(id);
 
       return token;
@@ -97,4 +99,33 @@ export class UserBusiness {
     }
   };
 
+  public editUser = async (input: EditUserInputDTO) => {
+    try {
+      const { name, nickname, token } = input;
+
+      if (!name || !nickname) {
+        throw new CustomError(
+          400,
+          'Preencha os campos "id", "name" e "nickname"'
+        );
+      }
+
+      if (name.length < 4) {
+        throw new InvalidName();
+      }
+
+      const { id } = authenticator.getTokenData(token);
+
+      const editUserInput: EditUserInput = {
+        id,
+        name,
+        nickname,
+      };
+
+      const userDatabase = new UserDatabase();
+      await userDatabase.editUser(editUserInput);
+    } catch (error: any) {
+      throw new CustomError(400, error.message);
+    }
+  };
 }
